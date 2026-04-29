@@ -3,6 +3,10 @@ set -euo pipefail
 
 cd /var/www/html
 
+export SESSION_DRIVER="${SESSION_DRIVER:-file}"
+export CACHE_STORE="${CACHE_STORE:-file}"
+export QUEUE_CONNECTION="${QUEUE_CONNECTION:-sync}"
+
 if [ "${APP_KEY:-}" = "" ]; then
   echo "APP_KEY is required for production boots."
   exit 1

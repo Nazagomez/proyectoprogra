@@ -33,6 +33,8 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,testing,views} da
 # During Docker build there is typically no `.env`; Laravel console bootstrapping used by Composer
 # scripts can fail unless a minimal `.env` exists with an `APP_KEY`.
 RUN test -f .env || cp .env.example .env \
+    && php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');" \
+    && php -r "\$p='.env'; \$c=file_get_contents(\$p); \$c=preg_replace('/^SESSION_DRIVER=.*/m','SESSION_DRIVER=file',\$c); \$c=preg_replace('/^CACHE_STORE=.*/m','CACHE_STORE=file',\$c); \$c=preg_replace('/^QUEUE_CONNECTION=.*/m','QUEUE_CONNECTION=sync',\$c); file_put_contents(\$p,\$c);" \
     && php artisan key:generate --force \
     && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
     && rm -f .env
