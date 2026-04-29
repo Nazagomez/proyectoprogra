@@ -5,6 +5,7 @@ WORKDIR /var/www/html
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git unzip ca-certificates curl \
+        libcurl4-openssl-dev \
         libsqlite3-dev sqlite3 \
         libpng-dev libjpeg62-turbo-dev libwebp-dev libfreetype6-dev libzip-dev \
         libonig-dev libxml2-dev libicu-dev \
