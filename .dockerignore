@@ -10,9 +10,12 @@ public/build
 public/hot
 public/storage
 
+# Local env files (do not ship in images)
 .env
-.env.*
-!.env.example
+.env.backup
+.env.production
+.env.local
+.env.development
 
 storage/logs
 storage/framework/cache

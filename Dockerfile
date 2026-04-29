@@ -31,7 +31,8 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,testing,views} da
     && chmod -R ug+rwx bootstrap/cache storage
 
 # During Docker image build we create a disposable `.env` so Composer's Laravel hooks can boot.
-RUN test -f .env || cp .env.example .env \
+RUN test -f .env.example \
+    && (test -f .env || cp .env.example .env) \
     && php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');" \
     && sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env \
     && sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env \
