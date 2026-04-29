@@ -32,7 +32,7 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,testing,views} da
 
 # During Docker build there is typically no `.env`; Laravel console bootstrapping used by Composer
 # scripts can fail unless a minimal `.env` exists with an `APP_KEY`.
-RUN cp -n .env.example .env \
+RUN test -f .env || cp .env.example .env \
     && php artisan key:generate --force \
     && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
     && rm -f .env
