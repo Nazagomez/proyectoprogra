@@ -12,6 +12,7 @@ public/storage
 
 .env
 .env.*
+!.env.example
 
 storage/logs
 storage/framework/cache
