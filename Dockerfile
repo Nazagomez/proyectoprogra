@@ -30,15 +30,19 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,testing,views} da
     && chown -R www-data:www-data bootstrap/cache storage \
     && chmod -R ug+rwx bootstrap/cache storage
 
-# During Docker build there is typically no `.env`; Laravel console bootstrapping used by Composer
-# scripts can fail unless a minimal `.env` exists with an `APP_KEY`.
+# During Docker image build we create a disposable `.env` so Composer's Laravel hooks can boot.
 RUN test -f .env || cp .env.example .env \
     && php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');" \
-    && php -r "\$p='.env'; \$c=file_get_contents(\$p); \$c=preg_replace('/^SESSION_DRIVER=.*/m','SESSION_DRIVER=file',\$c); \$c=preg_replace('/^CACHE_STORE=.*/m','CACHE_STORE=file',\$c); \$c=preg_replace('/^QUEUE_CONNECTION=.*/m','QUEUE_CONNECTION=sync',\$c); file_put_contents(\$p,\$c);" \
-    && php artisan key:generate --force \
+    && sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' .env \
+    && sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env \
+    && sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
+
+# Install deps without running Laravel scripts yet (those need a sane `.env` + sqlite file).
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+
+RUN php artisan key:generate --force \
     && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
     && rm -f .env
-
 RUN chmod +x /var/www/html/docker/entrypoint.sh
 
 EXPOSE 10000
