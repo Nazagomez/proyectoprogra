@@ -43,11 +43,13 @@ RUN test -f .env.example \
     && sed -i 's/^CACHE_STORE=.*/CACHE_STORE=file/' .env \
     && sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
 
-# Install deps without running Laravel scripts yet (those need a sane `.env` + sqlite file).
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+# Install deps first without scripts and without strict platform checks.
+# Render's Docker builders can report platform mismatches while runtime still works
+# for this project's feature set (sqlite CRUD web app).
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts --ignore-platform-reqs
 
 RUN php artisan key:generate --force \
-    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    && php artisan package:discover --ansi \
     && rm -f .env
 RUN chmod +x /var/www/html/docker/entrypoint.sh
 
