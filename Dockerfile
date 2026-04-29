@@ -15,7 +15,14 @@ RUN docker-php-ext-configure gd \
         --with-webp \
         --with-freetype \
     && docker-php-ext-install -j$(nproc) \
+        ctype \
+        curl \
+        dom \
+        fileinfo \
+        mbstring \
         pdo_sqlite \
+        tokenizer \
+        xml \
         bcmath \
         intl \
         zip \
