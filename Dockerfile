@@ -30,7 +30,12 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,testing,views} da
     && chown -R www-data:www-data bootstrap/cache storage \
     && chmod -R ug+rwx bootstrap/cache storage
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# During Docker build there is typically no `.env`; Laravel console bootstrapping used by Composer
+# scripts can fail unless a minimal `.env` exists with an `APP_KEY`.
+RUN cp -n .env.example .env \
+    && php artisan key:generate --force \
+    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    && rm -f .env
 
 RUN chmod +x /var/www/html/docker/entrypoint.sh
 
