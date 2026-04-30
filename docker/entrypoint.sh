@@ -16,6 +16,8 @@ mkdir -p database
 if [ ! -f database/database.sqlite ]; then
   touch database/database.sqlite
 fi
+mkdir -p bootstrap/cache storage/logs storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views
+chmod -R ug+rwx bootstrap/cache storage
 
 php artisan migrate --force
 php artisan db:seed --force
